@@ -1,0 +1,27 @@
+{
+  "name": "tempo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "patch-package"
+  },
+  "dependencies": {
+    "@privy-io/react-auth": "^3.9.0",
+    "@tanstack/react-query": "^5.90.12",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "viem": "^2.43.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "patch-package": "^8.0.1",
+    "typescript": "latest"
+  }
+}
