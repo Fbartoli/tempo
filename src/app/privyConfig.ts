@@ -23,7 +23,7 @@ export const privyConfig: PrivyClientConfig = {
     },
     showWalletUIs: false,
   },
-  loginMethods: ['email', 'google'],
+  loginMethods: ['email'],
   defaultChain: tempoTestnet,
   supportedChains: [tempoTestnet],
 }
