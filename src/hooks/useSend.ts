@@ -1,7 +1,7 @@
 import { TEMPO_TOKEN } from '@/constants'
 import { useWallets } from '@privy-io/react-auth'
 import { useState } from 'react'
-import {tempoTestnet} from 'viem/chains'
+import { tempoTestnet } from 'viem/chains'
 import { tempoActions } from 'viem/tempo'
 
 import {
@@ -22,62 +22,56 @@ export function useSend() {
   const send = (to: string, amount: string, memo: string = '') => {
     if (isSending) return Promise.resolve()
     
-    console.log('[useSend] Starting send transaction')
     setIsSending(true)
     setError(null)
     setTxHash(null)
 
     const timeoutId = setTimeout(() => {
-      console.log('[useSend] Timeout: Resetting isSending')
       setIsSending(false)
-    }, 10000)
+    }, 30000)
 
     const resetState = () => {
-      console.log('[useSend] Resetting isSending to false')
       clearTimeout(timeoutId)
       setIsSending(false)
     }
 
     const executeTransaction = async () => {
       try {
-        const wallet = wallets[0]
-        if (!wallet?.address) {
-          const errMsg = 'No active wallet'
+        const embeddedWallet = wallets.find(
+          (w) => w.walletClientType === 'privy'
+        )
+        if (!embeddedWallet?.address) {
+          const errMsg = 'No embedded wallet found'
           setError(errMsg)
           resetState()
           return
         }
         
-        const provider = await wallet.getEthereumProvider()
+        const provider = await embeddedWallet.getEthereumProvider()
         const client = createWalletClient({
-          account: wallet.address as Address,
+          account: embeddedWallet.address as Address,
           chain: tempoTestnet,
           transport: custom(provider),
         })
           .extend(walletActions)
           .extend(tempoActions())
 
-        const metadata = await client.token.getMetadata({
-          token: TEMPO_TOKEN,
-        })
 
-        const transferParams: any = {
+        const transferParams = {
           to: to as Address,
-          amount: parseUnits(amount, metadata.decimals),
+          amount: parseUnits(amount, 6),
           token: TEMPO_TOKEN,
         }
         
-        if (memo && memo.trim()) {
-          transferParams.memo = stringToHex(memo, { size: 32 })
-        }
 
-        const { receipt } = await client.token.transferSync(transferParams)
+        const receipt = await client.token.transfer({
+          to: to as Address,
+          amount: parseUnits(amount, 6),
+          token: TEMPO_TOKEN,
+        })
 
-        setTxHash(receipt.transactionHash)
         resetState()
-        return receipt.transactionHash
       } catch (err) {
-        debugger; // Breakpoint on error
         console.error('[useSend] Error caught:', err)
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to send'

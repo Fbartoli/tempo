@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "patch-package"
+    "lint": "next lint"
   },
   "dependencies": {
     "@privy-io/react-auth": "^3.9.0",
@@ -15,13 +14,15 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "viem": "^2.43.1"
+    "viem": "https://pkg.pr.new/viem@e3a1103"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "patch-package": "^8.0.1",
     "typescript": "latest"
+  },
+  "resolutions": {
+    "viem": "https://pkg.pr.new/viem@e3a1103"
   }
 }

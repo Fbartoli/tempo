@@ -5,9 +5,9 @@ import { tempoTestnet } from 'viem/chains'
 import { tempoActions } from 'viem/tempo'
 import {
   createPublicClient,
-  http,
   formatUnits,
   type Address,
+  custom,
 } from 'viem'
 
 export function useBalance() {
@@ -17,7 +17,9 @@ export function useBalance() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const walletAddress = wallets[0]?.address as Address | undefined
+  const walletAddress = wallets.find(
+    (w) => w.walletClientType === 'privy'
+  )?.address as Address | undefined
 
   useEffect(() => {
     if (!walletAddress) {
@@ -30,14 +32,22 @@ export function useBalance() {
       setError(null)
 
       try {
+        const embeddedWallet = wallets.find(
+          (w) => w.walletClientType === 'privy'
+        )
+        if (!embeddedWallet?.address) {
+          setError('No embedded wallet found')
+          return
+        }
+
         const client = createPublicClient({
           chain: tempoTestnet,
-          transport: http(),
+          transport: custom(await embeddedWallet.getEthereumProvider()),
         }).extend(tempoActions())
 
         const [balanceResult, metadata] = await Promise.all([
           client.token.getBalance({
-            account: walletAddress,
+            account: embeddedWallet.address as Address,
             token: TEMPO_TOKEN,
           }),
           client.token.getMetadata({
